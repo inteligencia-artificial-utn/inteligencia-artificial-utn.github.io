@@ -14,16 +14,29 @@
 
         <div class="jumbotron">
 
-            <h1>Reconocimiento óptico de caracteres númericos</h1>
+            <h2>Reconocimiento óptico de caracteres númericos</h2>
           
             <hr>
 
-            <div id="container">
-                <canvas id="sketchpad" width="280" height="280">Sorry, your browser is not supported.</canvas>
-                <div id="result" style="height:150px;"></div>
+            <div class="row">
+              <div class="col-sm-6">
+                <p>Dibujo:</p>
+                  <canvas id="sketchpad" height="280">Sorry, your browser is not supported.</canvas>
+              </div>
+              <div class="col-sm-6">
+                  <p>Resultado:</p>
+                  <div id="result" style="height:280px;"></div>
+              </div>
             </div>
-            <button type="button" id="analyzeButton" class="btn btn-primary">Analizar</button>
-            <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
+
+            <br>
+
+            <div class="row">
+              <div class="col-sm-12">
+                  <button type="button" id="analyzeButton" class="btn btn-primary btn-lg" style="margin:5px;">Analizar</button>
+                  <button type="button" id="resetButton" class="btn btn-secondary btn-lg" style="margin:5px;">Reset</button>
+              </div>
+            </div>
 
         </div>
 

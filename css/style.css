@@ -3,10 +3,6 @@ body {
   padding: 10px;
   font-family:Arial;
 }
-#container {
-  /*position:relative;*/
-  /*width: 500px;*/
-}
 #sketchpad {
   border: 4px solid #077;
 }
@@ -14,12 +10,9 @@ body {
   border: 1px solid #077;
 }
 #result {
-  font-size: 128pt;
-  float: right;
-  width: 30%;
-  /*width: 120px;
-  height: 270px;*/
+  font-size: 200pt;
+  width: 100%;
   border: 4px solid #077;
   text-align: center;
-  line-height: 150px;
+  line-height: 240px;
 }
