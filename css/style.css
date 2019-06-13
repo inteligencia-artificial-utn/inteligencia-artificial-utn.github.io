@@ -4,8 +4,8 @@ body {
   font-family:Arial;
 }
 #container {
-  position:relative;
-  width: 500px;
+  /*position:relative;*/
+  /*width: 500px;*/
 }
 #sketchpad {
   border: 4px solid #077;
@@ -16,8 +16,9 @@ body {
 #result {
   font-size: 128pt;
   float: right;
-  width: 120px;
-  height: 280px;
+  width: 30%;
+  /*width: 120px;
+  height: 270px;*/
   border: 4px solid #077;
   text-align: center;
   line-height: 150px;
