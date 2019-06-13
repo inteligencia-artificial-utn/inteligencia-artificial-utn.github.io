@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>ejemplo_ocr</title>
+    <link href="./css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Ejemplo reconocimiento óptico de caracteres</h1>
+    <br/>
+    <div id="container">
+        <canvas id="sketchpad" width="280" height="280">Sorry, your browser is not supported.</canvas>
+        <div id="result" style="height:150px;"></div>
+    </div>
+    <button type="button" id="analyzeButton">Analizar!</button>
+    <button type="button" id="resetButton">Reset</button>
+    <br/>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/mnist_dataset.js"></script>
+    <script src="./js/drawing_utilities.js"></script>
+    <script src="./js/krag_network.js"></script>
+    <script src="./js/main.js"></script>
+  </body>
+</html>
