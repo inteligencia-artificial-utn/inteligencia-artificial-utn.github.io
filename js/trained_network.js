@@ -1,6 +1,6 @@
-function KragNetwork() {};
+function TrainedNetwork() {};
 
-KragNetwork.net = function(input) {
+TrainedNetwork.net = function(input) {
     var netData = window["netData"]
     for (var i = 1; i < netData.layers.length; i++) {
       var layer = netData.layers[i];
@@ -20,7 +20,7 @@ KragNetwork.net = function(input) {
     return output;
 }
 
-KragNetwork.getMax = function(output) {
+TrainedNetwork.getMax = function(output) {
     let array = []
     for (let i in output) {
         array.push(output[i])
@@ -29,7 +29,7 @@ KragNetwork.getMax = function(output) {
     return array.indexOf(max);
 }
   
-KragNetwork.analize = function(input) {
-    var output = KragNetwork.net(input);
-    return KragNetwork.getMax(output);
+TrainedNetwork.analize = function(input) {
+    var output = TrainedNetwork.net(input);
+    return TrainedNetwork.getMax(output);
 }

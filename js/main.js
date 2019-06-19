@@ -8,6 +8,6 @@ $("#resetButton").click(function() {
 
 $("#analyzeButton").click(function() {
     var dataArray = convertDrawToArray();
-    var output = KragNetwork.analize(dataArray);
+    var output = TrainedNetwork.analize(dataArray);
     document.getElementById('result').innerText = output.toString();
 });
