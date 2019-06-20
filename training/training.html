@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>training</title>
+  </head>
+  <body>
+    <h1>Entrenamiento</h1>
+    <br/>
+    <div id="container">
+    </div>
+    <button type="button" id="trainButton">Entrenar!</button>
+    <br/>
+	<script src="./mnist.js"></script>
+	<script src="./brain.js"></script>
+    <script>
+		document.getElementById("trainButton").addEventListener("click", async function(){
+				
+				var set = mnist.set(100, 200);
+				var trainingSet = set.training;
+				var testSet = set.test;
+				
+				var net = new brain.NeuralNetwork({hiddenLayers: [784, 392, 196]});
+				console.log(testSet);
+
+				debugger;
+
+				net.train(trainingSet, {
+					iterations: 20000,
+					errorThresh: 0.0001,
+					log: true,
+					logPeriod: 1,
+					learningRate: 0.1
+				});
+		});
+	</script>
+  </body>
+</html>
