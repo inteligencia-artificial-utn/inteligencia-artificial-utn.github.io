@@ -1,1 +1,260 @@
-function initializeSketchpad(){function e(e){let t=0,a=0;for(;e;)t+=parseInt(e.offsetTop),a+=parseInt(e.offsetLeft),e=e.offsetParent;return{top:t,left:a}}function t(e){let t=null;switch(e.type){case"mousedown":e.touches=[],e.touches[0]={pageX:e.pageX,pageY:e.pageY},t="touchstart";break;case"mousemove":e.touches=[],e.touches[0]={pageX:e.pageX,pageY:e.pageY},t="touchmove";break;case"mouseup":e.touches=[],e.touches[0]={pageX:e.pageX,pageY:e.pageY},t="touchend"}let a;a="touchend"===e.type?{x:e.changedTouches[0].pageX,y:e.changedTouches[0].pageY}:{x:e.touches[0].pageX,y:e.touches[0].pageY},t=t||e.type,i[t](a)}let a,n=document.getElementById("sketchpad"),o=n.getContext("2d"),r=e(n),c=!1;window.clearSketchpad=function(){o.clearRect(0,0,280,280),c=!1},window.clearSketchpad();const i={isDrawing:!1,touchstart(e){o.beginPath(),o.lineWidth=20,o.lineCap="round",o.moveTo(e.x-r.left,e.y-r.top),this.isDrawing=!0},touchmove(e){if(this.isDrawing){try{clearTimeout(a)}catch(e){}c&&clearSketchpad(),o.lineTo(e.x-r.left,e.y-r.top),o.stroke()}},touchend(e){this.isDrawing&&(this.touchmove(e),this.isDrawing=!1)}};"createTouch"in document||"ontouchstart"in window?(n.addEventListener("touchstart",t,!1),n.addEventListener("touchmove",t,!1),n.addEventListener("touchend",t,!1)):(n.addEventListener("mousedown",t,!1),n.addEventListener("mousemove",t,!1),n.addEventListener("mouseup",t,!1)),window.addEventListener("resize",t=>{t.preventDefault();r=e(n)},!1),document.body.addEventListener("touchmove",e=>{e.preventDefault()},!1)}function centerImage(e){for(var t=0,a=0,n=e.length,o=e[0].length,r=0,c=0;n>c;c++)for(var i=0;o>i;i++){var s=1-e[c][i];r+=s,a+=c*s,t+=i*s}t/=r,a/=r;var g=Math.round(n/2-a);return{transX:Math.round(o/2-t),transY:g}}function getBoundingRectangle(e,t){for(var a=e.length,n=e[0].length,o=n,r=a,c=-1,i=-1,s=0;a>s;s++)for(var g=0;n>g;g++)e[s][g]<t&&(o>g&&(o=g),g>c&&(c=g),r>s&&(r=s),s>i&&(i=s));return{minY:r,minX:o,maxY:i,maxX:c}}function imageDataToGrayscale(e){for(var t=[],a=0;a<e.height;a++){t[a]=[];for(var n=0;n<e.width;n++){var o=4*a*e.width+4*n;0==e.data[o+3]&&(e.data[o]=255,e.data[o+1]=255,e.data[o+2]=255),e.data[o+3]=255,t[a][n]=e.data[4*a*e.width+4*n+0]/255}}return t}function convertDrawToArray(){const e=document.getElementById("sketchpad"),t=e.getContext("2d");let a=t.getImageData(0,0,280,280);grayscaleImg=imageDataToGrayscale(a);const n=getBoundingRectangle(grayscaleImg,.01),o=centerImage(grayscaleImg),r=document.createElement("canvas");r.width=a.width,r.height=a.height;const c=r.getContext("2d"),i=n.maxX+1-n.minX,s=n.maxY+1-n.minY,g=190/(i>s?i:s);c.translate(e.width/2,e.height/2),c.scale(g,g),c.translate(-e.width/2,-e.height/2),c.translate(o.transX,o.transY),c.drawImage(t.canvas,0,0),a=c.getImageData(0,0,280,280),grayscaleImg=imageDataToGrayscale(a),console.log(grayscaleImg);const d=Array(784),h=[];for(u=0;28>u;u++)for(m=0;28>m;m++){let e=0;for(let t=0;10>t;t++)for(let a=0;10>a;a++)e+=grayscaleImg[10*u+t][10*m+a];e=1-e/100,d[28*m+u]=(e-.5)/.5}t.clearRect(0,0,e.width,e.height),t.drawImage(c.canvas,0,0);for(var u=0;28>u;u++)for(var m=0;28>m;m++){const e=t.getImageData(10*m,10*u,10,10),a=255*(.5-d[28*m+u]/2);h.push(Math.round((255-a)/255*100)/100);for(let t=0;400>t;t+=4)e.data[t]=a,e.data[t+1]=a,e.data[t+2]=a,e.data[t+3]=255;t.putImageData(e,10*m,10*u)}return h}
+function initializeSketchpad(){
+    let touchend;
+    let canvas = document.getElementById('sketchpad');
+    let context = canvas.getContext('2d');
+    let canvasOffset = getOffsetSum(canvas);
+
+    const footprint = {
+        width: 28,
+        height: 28
+    };
+
+    let isRecognized = false;
+    const zoom = 10;
+
+    window.clearSketchpad = function clearSketchpad () {
+        context.clearRect(0,0,footprint.width*zoom,footprint.height*zoom);
+        isRecognized = false;
+    };
+    window.clearSketchpad();
+
+    function getOffsetSum(elem) {
+        let top=0;
+        let left=0;
+        while(elem) {
+            top = top + parseInt(elem.offsetTop)
+            left = left + parseInt(elem.offsetLeft)
+            elem = elem.offsetParent
+        }
+
+        return {top, left}
+    }
+
+    const drawer = {
+        isDrawing: false,
+        touchstart(coors) {
+            context.beginPath();
+            context.lineWidth = 20;
+            context.lineCap="round";
+            context.moveTo(coors.x-canvasOffset.left, coors.y-canvasOffset.top);
+            this.isDrawing = true;
+        },
+        touchmove(coors) {
+            if (this.isDrawing) {
+				try {
+					clearTimeout(touchend)
+				} catch(e) {
+
+				}
+                if (isRecognized) {
+                    clearSketchpad();
+                }
+                context.lineTo(coors.x-canvasOffset.left, coors.y-canvasOffset.top);
+                context.stroke();
+            }
+        },
+        touchend(coors) {
+            if (this.isDrawing) {
+                this.touchmove(coors);
+                this.isDrawing = false;
+            }
+        }
+    };
+
+    function draw(event) {
+        let type = null;
+
+        switch(event.type){
+            case "mousedown":
+                    event.touches = [];
+                    event.touches[0] = {
+                        pageX: event.pageX,
+                        pageY: event.pageY
+                    };
+                    type = "touchstart";
+            break;
+            case "mousemove":
+                    event.touches = [];
+                    event.touches[0] = {
+                        pageX: event.pageX,
+                        pageY: event.pageY
+                    };
+                    type = "touchmove";
+            break;
+            case "mouseup":
+                    event.touches = [];
+                    event.touches[0] = {
+                        pageX: event.pageX,
+                        pageY: event.pageY
+                    };
+                    type = "touchend";
+            break;
+        }
+
+        let coors;
+        if(event.type === "touchend") {
+            coors = {
+                x: event.changedTouches[0].pageX,
+                y: event.changedTouches[0].pageY
+            };
+        }
+        else {
+            coors = {
+                x: event.touches[0].pageX,
+                y: event.touches[0].pageY
+            };
+        }
+        type = type || event.type
+        drawer[type](coors);
+    }
+
+    const touchAvailable = ('createTouch' in document) || ('ontouchstart' in window);
+
+    if(touchAvailable){
+        canvas.addEventListener('touchstart', draw, false);
+        canvas.addEventListener('touchmove', draw, false);
+        canvas.addEventListener('touchend', draw, false);
+    }
+    else {
+        canvas.addEventListener('mousedown', draw, false);
+        canvas.addEventListener('mousemove', draw, false);
+        canvas.addEventListener('mouseup', draw, false);
+    }
+
+    window.addEventListener("resize", event => {
+        event.preventDefault();
+        canvasOffset = getOffsetSum(canvas);
+    }, false);
+
+    document.body.addEventListener('touchmove', event => {
+        event.preventDefault();
+    }, false);
+}
+
+function centerImage(img) {
+    var meanX = 0;
+    var meanY = 0;
+    var rows = img.length;
+    var columns = img[0].length;
+    var sumPixels = 0;
+    for (var y = 0; y < rows; y++) {
+        for (var x = 0; x < columns; x++) {
+            var pixel = (1 - img[y][x]);
+            sumPixels += pixel;
+            meanY += y * pixel;
+            meanX += x * pixel;
+        }
+    }
+    meanX /= sumPixels;
+    meanY /= sumPixels;
+
+    var dY = Math.round(rows/2 - meanY);
+    var dX = Math.round(columns/2 - meanX);
+    return {transX: dX, transY: dY};
+}
+
+function getBoundingRectangle(img, threshold) {
+    var rows = img.length;
+    var columns = img[0].length;
+    var minX=columns;
+    var minY=rows;
+    var maxX=-1;
+    var maxY=-1;
+    for (var y = 0; y < rows; y++) {
+        for (var x = 0; x < columns; x++) {
+            if (img[y][x] < threshold) {
+                if (minX > x) minX = x;
+                if (maxX < x) maxX = x;
+                if (minY > y) minY = y;
+                if (maxY < y) maxY = y;
+            }
+        }
+    }
+    return { minY: minY, minX: minX, maxY: maxY, maxX: maxX};
+}
+
+function imageDataToGrayscale(imgData) {
+    var grayscaleImg = [];
+    for (var y = 0; y < imgData.height; y++) {
+        grayscaleImg[y]=[];
+        for (var x = 0; x < imgData.width; x++) {
+            var offset = y * 4 * imgData.width + 4 * x;
+            var alpha = imgData.data[offset+3];
+            if (alpha == 0) {
+                imgData.data[offset] = 255;
+                imgData.data[offset+1] = 255;
+                imgData.data[offset+2] = 255;
+            }
+            imgData.data[offset+3] = 255;
+
+            grayscaleImg[y][x] = imgData.data[y*4*imgData.width + x*4 + 0] / 255;
+        }
+    }
+    return grayscaleImg;
+}
+
+function convertDrawToArray() {
+    const canvas = document.getElementById('sketchpad');
+    const context = canvas.getContext('2d');
+
+            let imgData = context.getImageData(0, 0, 280, 280);
+
+            grayscaleImg = imageDataToGrayscale(imgData);
+            const boundingRectangle = getBoundingRectangle(grayscaleImg, 0.01);
+            const trans = centerImage(grayscaleImg);
+
+            const canvasCopy = document.createElement("canvas");
+            canvasCopy.width = imgData.width;
+            canvasCopy.height = imgData.height;
+            const copyCtx = canvasCopy.getContext("2d");
+            const brW = boundingRectangle.maxX+1-boundingRectangle.minX;
+            const brH = boundingRectangle.maxY+1-boundingRectangle.minY;
+            const scaling = 190 / (brW>brH?brW:brH);
+            // scale
+            copyCtx.translate(canvas.width/2, canvas.height/2);
+            copyCtx.scale(scaling, scaling);
+            copyCtx.translate(-canvas.width/2, -canvas.height/2);
+            // translate to center of mass
+            copyCtx.translate(trans.transX, trans.transY);
+            copyCtx.drawImage(context.canvas, 0, 0);
+
+            // now bin image into 10x10 blocks (giving a 28x28 image)
+            imgData = copyCtx.getImageData(0, 0, 280, 280);
+            grayscaleImg = imageDataToGrayscale(imgData);
+            console.log(grayscaleImg);
+
+            const nnInput = new Array(784);
+            const nnInput2 = [];
+            for (var y = 0; y < 28; y++) {
+	            for (var x = 0; x < 28; x++) {
+	                let mean = 0;
+	                for (let v = 0; v < 10; v++) {
+	                    for (let h = 0; h < 10; h++) {
+	                        mean += grayscaleImg[y*10 + v][x*10 + h];
+	                    }
+	                }
+	                mean = (1 - mean / 100); // average and invert
+	                nnInput[x*28+y] = (mean - .5) / .5;
+	            }
+	        }
+
+            
+	        context.clearRect(0, 0, canvas.width, canvas.height);
+	        context.drawImage(copyCtx.canvas, 0, 0);
+	        for (var y = 0; y < 28; y++) {
+	            for (var x = 0; x < 28; x++) {
+	                const block = context.getImageData(x * 10, y * 10, 10, 10);
+	                const newVal = 255 * (0.5 - nnInput[x*28+y]/2);
+	                nnInput2.push(Math.round((255-newVal)/255*100)/100);
+	                for (let i = 0; i < 4 * 10 * 10; i+=4) {
+	                        block.data[i] = newVal;
+	                        block.data[i+1] = newVal;
+	                        block.data[i+2] = newVal;
+	                        block.data[i+3] = 255;
+	                }
+	                context.putImageData(block, x * 10, y * 10);
+	            }
+	        }
+
+            return nnInput2;
+}

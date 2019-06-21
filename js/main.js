@@ -1,1 +1,13 @@
-$(document).ready(function(){initializeSketchpad()}),$("#resetButton").click(function(){clearSketchpad()}),$("#analyzeButton").click(function(){var e=convertDrawToArray(),t=TrainedNetwork.analize(e);document.getElementById("result").innerText=""+t});
+$(document).ready(function() {
+    initializeSketchpad();
+});
+
+$("#resetButton").click(function() {
+    clearSketchpad();
+});
+
+$("#analyzeButton").click(function() {
+    var dataArray = convertDrawToArray();
+    var output = TrainedNetwork.analize(dataArray);
+    document.getElementById('result').innerText = output.toString();
+});
